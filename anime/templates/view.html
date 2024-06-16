@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{ anime.image.url }}" class="img-fluid" alt="{{ anime.name }}">
+        </div>
+        <div class="col-md-8">
+            <h2>{{ anime.name }}</h2>
+            <p><strong>Дата створення:</strong> {{ anime.created_at }}</p>
+            <p><strong>Жанри:</strong>
+                {% for genre in anime.genres.all %}
+                    {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Команди озвучення:</strong>
+                {% for voice in anime.voices.all %}
+                    {{ voice.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Кількість епізодів:</strong> {{ anime.episodes }}</p>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3>Опис</h3>
+            <p>{{ anime.description }}</p>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3>Список серій</h3>
+            <div class="accordion" id="episodesAccordion">
+                {% for voice in anime.voices.all %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ voice.id }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ voice.id }}" aria-expanded="false" aria-controls="collapse{{ voice.id }}">
+                                {{ voice.name }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ voice.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ voice.id }}" data-bs-parent="#episodesAccordion">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    {% for episode in anime.episodes.all %}
+                                        {% if episode.voice_acting_team == voice %}
+                                            <a class="btn btn-primary" data-bs-toggle="collapse" href="#{{ episode.id }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                {{ episode.name }}
+                                            </a>
+                                            <div id="{{ episode.id }}" class="col-md-6 collapse">
+                                                <div class="card mb-3">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ episode.name }}</h5>
+                                                        <video controls class="w-100">
+                                                            <source src="{{ episode.video.url }}" type="video/mp4">
+                                                            Ваш браузер не підтримує відео тег.
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
