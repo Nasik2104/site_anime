@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="container mt-5">
+        <h2>Додати епізод</h2>
+        <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Підтвердити</button>
+        </form>
+
+    </div>
+{% endblock %}

@@ -2,7 +2,6 @@
 
 {% block main %}
 <div class="container mt-4">
-    <!-- Anime Details Section -->
     <div class="row">
         <div class="col-md-4">
             <img src="{{ anime.image.url }}" class="img-fluid" alt="{{ anime.name }}">
@@ -23,16 +22,17 @@
             <p><strong>Кількість епізодів:</strong> {{ anime.episodes_count }}</p>
         </div>
     </div>
-
-    <!-- Description Section -->
     <div class="row mt-4">
         <div class="col-12">
             <h3>Опис</h3>
             <p>{{ anime.description }}</p>
         </div>
+        <div class="col-12">
+            <a class="btn btn-primary mb-2" href="{% url "anime:create_room" anime.id %}">
+                 Дивитись Разом
+            </a>
+        </div>
     </div>
-
-    <!-- Episodes List Section -->
     <div class="row mt-4">
         <div class="col-12">
             <h3>Список серій</h3>
@@ -49,26 +49,31 @@
                                 <div class="row">
                                     {% for episode in anime.episodes.all %}
                                         {% if episode.voice_acting_team == voice %}
-                                        {% if forloop.counter0|divisibleby:6 %}
-                                            </div><div class="row mt-2">
+                                            {% if forloop.counter0|divisibleby:6 %}
+                                                </div><div class="row mt-2">
+                                            {% endif %}
+                                            <div class="col-md-2">
+                                                <a class="btn btn-primary mb-2" data-bs-toggle="collapse" href="#episode{{ episode.id }}" role="button" aria-expanded="false" aria-controls="episode{{ episode.id }}">
+                                                    серія {{ episode.number }}
+                                                </a>
+                                            </div>
                                         {% endif %}
-                                        <div class="col-md-1">
-                                            <a class="btn btn-primary mb-2" data-bs-toggle="collapse" href="#episode{{ episode.id }}" role="button" aria-expanded="false" aria-controls="episode{{ episode.id }}">
-                                                {{ episode.name }}
-                                            </a>
-                                        </div>
-                                        <br>
-                                        <div id="episode{{ episode.id }}" class="col-md-6 collapse">
-                                            <div class="card mb-3">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">{{ episode.name }}</h5>
-                                                    <video controls class="w-100">
-                                                        <source src="{{ episode.video.url }}" type="video/mp4">
-                                                        Ваш браузер не підтримує відео тег.
-                                                    </video>
+                                    {% endfor %}
+                                </div>
+                                <div class="row">
+                                    {% for episode in anime.episodes.all %}
+                                        {% if episode.voice_acting_team == voice %}
+                                            <div id="episode{{ episode.id }}" class="col-md-12 collapse" data-bs-parent="#collapse{{ voice.id }}">
+                                                <div class="card mb-3">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ episode.name }}</h5>
+                                                        <video controls class="w-100">
+                                                            <source src="{{ episode.video.url }}" type="video/mp4">
+                                                            Ваш браузер не підтримує відео тег.
+                                                        </video>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -80,4 +85,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var collapses = document.querySelectorAll('.collapse');
+        collapses.forEach(function (collapse) {
+            collapse.addEventListener('show.bs.collapse', function () {
+                var videos = document.querySelectorAll('video');
+                videos.forEach(function (video) {
+                    video.pause();
+                });
+            });
+        });
+    });
+</script>
 {% endblock %}

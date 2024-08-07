@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="container">
+    <div class="col-md-6 mx-auto">
+        <h1>Реєстрація</h1>
+        <form method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Зареєструватись</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

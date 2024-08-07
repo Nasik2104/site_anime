@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block main %}
+
+<video controls class="w-100">
+    <source src="{{ room.episode.video.url }}" type="video/mp4">
+    Ваш браузер не підтримує відео тег.
+</video>
+
+{% endblock main %}

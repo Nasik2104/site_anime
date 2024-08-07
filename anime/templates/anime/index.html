@@ -7,7 +7,7 @@
         <a href="{%  url 'anime:view' i.id %}" class="text-decoration-none">
             <div class="col">
                 <div class="card h-100">
-                    <img src="{{ i.image.url }}" class="card-img-top anime-img" alt="{{ i.name }}">
+                    <img src="{{ i.image.url }}" class="card-img-top anime-img" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">{{ i.name }}</h5>
                         <p class="card-text">Епізодів: {{ i.get_episodes_voiced_count }}/{{ i.episodes_count }}</p>
@@ -16,6 +16,6 @@
             </div>
         </a>
     {% endfor %}
-
+</div>
 </div>
 {% endblock %}
