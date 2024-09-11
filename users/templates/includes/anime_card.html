@@ -1,0 +1,21 @@
+<a class="text-decoration-none" href="{% url 'anime:view' anime.id %}">
+    <div class="card mb-3" style="max-width: 500px;">
+    <div class="row g-0">
+        <div class="col-md-3">
+            <img src="{{ anime.image.url }}" class="img-fluid rounded-start" alt="...">
+        </div>
+        <div class="col-md-9">
+            <div class="card-body">
+                <h5 class="card-title">{{ anime.name }}</h5>
+                <p class="card-text">{{ anime.description }}</p>
+                <p class="card-text">
+                    {% for genre in anime.genres.all %}
+                        {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</a>

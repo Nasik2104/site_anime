@@ -1,6 +1,8 @@
 from django import forms
+from django.contrib.auth import authenticate
+from django.contrib.auth.forms import AuthenticationForm
 
-from .models import CustomUser
+from .models import CustomUser, Profile
 
 
 class RegisterForm(forms.ModelForm):
@@ -22,18 +24,50 @@ class RegisterForm(forms.ModelForm):
         return data.get('password2')
 
 
-class LoginForm(forms.Form):
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label='Пароль')
+class LoginForm(AuthenticationForm):
+    username = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
-    def clean_data(self, *args, **kwargs):
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'password']
+
+    def clean(self, *args, **kwargs):
         email = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')
 
         if email and password:
-            queryset = CustomUser.objects.filter(email=email)
-            if not queryset.exists():
-                raise forms.ValidationError('Такого користувача не існує')
-
+            qs = CustomUser.objects.filter(email=email)
+            if not qs.exists():
+                raise forms.ValidationError('User does not exists')
         return super(LoginForm, self).clean()
 
+
+class UserEditForm(forms.ModelForm):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'name']
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control'})
+        }
+
+
+class UserProfileEditForm(forms.ModelForm):
+    image = forms.ImageField(widget=forms.ClearableFileInput(attrs={'class': "form-control"}))
+
+    class Meta:
+        model = Profile
+        fields = ['nickname', 'image']
+
+        widgets = {
+            'nickname': forms.TextInput(
+                attrs={'class': 'form-control'}
+            )
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image'].required = False

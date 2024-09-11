@@ -1,10 +1,86 @@
 {% extends 'base.html' %}
 
 {% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <video controls class="w-100" id="videoPlayer">
+                <source src="{{ room.episode.video.url }}" type="video/mp4">
+                Ваш браузер не підтримує відео тег.
+            </video>
+        </div>
+        <div class="col-md-4">
+            {% include "anime/chat.html" %}
+        </div>
+        <div>
+        <button id="playButton">Відтворити</button>
+        <button id="pauseButton">Пауза</button>
+            </div>
+    </div>
+</div>
 
-<video controls class="w-100">
-    <source src="{{ room.episode.video.url }}" type="video/mp4">
-    Ваш браузер не підтримує відео тег.
-</video>
+<script>
+    const roomName2 = "{{ room.id }}" ;
+    const videoPlayer = document.getElementById("videoPlayer");
+    const playButton = document.getElementById("playButton");
+    const pauseButton = document.getElementById("pauseButton");
 
+    const socket = new WebSocket(`ws://${window.location.host}/ws/watch_together/${roomName2}/`);
+
+    socket.onopen = function(event) {
+        console.log("WebSocket підключено.");
+    };
+
+    socket.onerror = function(event) {
+        console.error("WebSocket помилка:", event);
+    };
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log("Отримано повідомлення:", data); // Логування для відладки
+        const message = data.message;
+        const currentTime = parseFloat(data.currentTime);  // Перетворення на число
+        const user = {{ request.user.id }}
+        const admin = {{ room.admin.id }}
+
+        if (user !== admin)
+            {#videoPlayer.addEventListener('loadedmetadata', function() {#}
+            {#    videoPlayer.currentTime = currentTime;});#}
+            {##}
+            if (message === "play") {
+                videoPlayer.currentTime = currentTime;
+                videoPlayer.play().catch(error => {
+                    console.error("Помилка при відтворенні відео:", error);
+                });
+            } else if (message === "pause") {
+                videoPlayer.pause();  // Пауза відео
+            }
+        };
+
+
+    playButton.onclick = function() {
+        const user = parseInt({{ request.user.id }}, 10);
+        const admin = parseInt({{ room.admin.id }}, 10);
+
+        if (user === admin) {
+            const currentTime = videoPlayer.currentTime;
+            socket.send(JSON.stringify({ message: "play", currentTime: currentTime }));
+
+            videoPlayer.play().catch(error => {
+                console.error("Помилка при відтворенні відео:", error);
+            });
+        }
+    };
+
+    pauseButton.onclick = function() {
+        const user = parseInt({{ request.user.id }}, 10);
+        const admin = parseInt({{ room.admin.id }}, 10);
+
+        if (user === admin) {
+            const currentTime = videoPlayer.currentTime;
+            socket.send(JSON.stringify({ message: "pause", currentTime: currentTime }));
+            videoPlayer.pause();
+        }
+    };
+</script>
 {% endblock main %}

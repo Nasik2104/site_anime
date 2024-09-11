@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
-
+{% load static %}
+<header>
+    {% block links %}<link rel="stylesheet" href="{% static 'anime/css/style.css' %}">{% endblock %}
+    {% block title %}<title>{{ anime.name }}</title>{% endblock %}
+</header>
 {% block main %}
 <div class="container mt-4">
     <div class="row">
@@ -20,6 +24,10 @@
                 {% endfor %}
             </p>
             <p><strong>Кількість епізодів:</strong> {{ anime.episodes_count }}</p>
+            <form id="anime-form" method="post" action="{% url 'anime:add_to_list' anime.id%}">
+                {% csrf_token %}
+                {{ form.list }}
+            </form>
         </div>
     </div>
     <div class="row mt-4">
@@ -28,7 +36,7 @@
             <p>{{ anime.description }}</p>
         </div>
         <div class="col-12">
-            <a class="btn btn-primary mb-2" href="{% url "anime:create_room" anime.id %}">
+            <a class="btn btn-primary mb-2" href="{% url "anime:create_room"%}">
                  Дивитись Разом
             </a>
         </div>
@@ -96,6 +104,16 @@
                     video.pause();
                 });
             });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var selectElement = document.querySelector('#list');
+        var form = document.getElementById('anime-form');
+
+        selectElement.addEventListener('change', function() {
+            form.submit();
         });
     });
 </script>

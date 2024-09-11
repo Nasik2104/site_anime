@@ -1,21 +1,64 @@
 {% extends 'base.html' %}
-
 {% block main %}
+{% load anime_extras %}
 <div class="container w-45">
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for i in anime %}
-        <a href="{%  url 'anime:view' i.id %}" class="text-decoration-none">
-            <div class="col">
-                <div class="card h-100">
-                    <img src="{{ i.image.url }}" class="card-img-top anime-img" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ i.name }}</h5>
-                        <p class="card-text">Епізодів: {{ i.get_episodes_voiced_count }}/{{ i.episodes_count }}</p>
-                    </div>
+    <h1>Нещодавно оновлені</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% get_recent_updates as recent_updates %}
+        {% for update in recent_updates %}
+            <div class="col-md-auto">
+                <a href="{% url 'anime:view' update.id %}">
+                <div class="card" style="width: 7rem;">
+                    <img src="{{ update.image.url }}" class="card-img-top" alt="{{ update.name }}">
+
                 </div>
+                </a>
             </div>
-        </a>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
+<br>
+<div class="container w-30">
+    <div class="row row-cols-1 row-cols-md-5 g-5">
+        {% for i in anime %}
+            <div class="col">
+                <a class="text-decoration-none " href="{% url 'anime:view' i.id %}" style="color: inherit;">
+                    <div class="card h-100">
+                        <img src="{{ i.image.url }}" class="card-img-top anime-img" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ i.name }}</h5>
+                            <p class="card-text">Епізодів: {{ i.get_episodes_voiced_count }}/{{ i.episodes_count }}</p>
+                        </div>
+                        <div class="card-footer">
+                            {% for genre in i.genres.all %}
+                                <a class="" href="{% url 'anime:filter' genre.id %}" style="color: inherit;">
+                                    {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
 </div>
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item ">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><<<</a>
+            </li>
+        {% endif %}
+        {% for page_obj in paginator %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">>>></a>
+            </li>
+        {% endif %}
+  </ul>
+</nav>
 {% endblock %}

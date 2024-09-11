@@ -2,6 +2,65 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.db import models
 
 
+class ListManager(models.Manager):
+    def get_anime_list(self, anime, user):
+        """
+        This function returns the name of the list where the anime currently.
+        Parameters:
+            anime (Anime): The anime instance.
+            user (CustomUser): The user instance.
+        Returns:
+            str: The name of the list where the anime is found.
+        """
+
+        list_mapping = {
+            'favourite': FavoriteList,
+            'watch': WatchList,
+            'plans': PlansList,
+            'abandoned': AbandonedList,
+            'watched': WatchedList
+        }
+
+        for list_name, model in list_mapping.items():
+            list_instance = model.objects.filter(user=user, anime=anime).first()
+            if list_instance:
+                return list_name
+
+        return None
+
+    def add(self, list_name, anime, user):
+        """
+        This function adds anime to the specified list.
+        Parameters:
+            list_name (str): The name of the list ('favourite', 'watch', etc.)
+            anime (Anime): The anime instance to add.
+            user (CustomUser): The user instance.
+        """
+        # Define the list models
+        list_mapping = {
+            'favourite': FavoriteList,
+            'watch': WatchList,
+            'plans': PlansList,
+            'abandoned': AbandonedList,
+            'watched': WatchedList
+        }
+
+        list_model = list_mapping.get(list_name)
+        if list_model:
+            for model in list_mapping.values():
+                list_instance = model.objects.filter(user=user).first()
+                if list_instance:
+                    list_instance.anime.remove(anime)
+
+            list_instance, _ = list_model.objects.get_or_create(user=user)
+            list_instance.anime.add(anime)
+        else:
+            for model in list_mapping.values():
+                list_instance = model.objects.filter(user=user).first()
+                if list_instance:
+                    list_instance.anime.remove(anime)
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email and password:
@@ -43,26 +102,52 @@ class CustomUser(AbstractBaseUser):
         return True
 
 
-# class FriendsList(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='friend_list')
-#     anime = models.ManyToManyField(CustomUser, blank=True)
-#
-#
-# class WatchList(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watch_list')
-#     anime = models.ManyToManyField("anime.Anime", blank=True)
-#
-#
-# class PlansList(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='plans_list')
-#     anime = models.ManyToManyField("anime.Anime", blank=True)
-#
-#
-# class AbandonedList(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='abandoned_list')
-#     anime = models.ManyToManyField("anime.Anime", blank=True)
-#
-#
-# class FavoriteList(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favourite_list')
-#     anime = models.ManyToManyField("anime.Anime", blank=True)
+class Profile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
+    image = models.ImageField(upload_to='user_pictures', null=True, blank=True)
+    nickname = models.CharField(max_length=64, null=True, blank=True)
+
+
+class FriendsList(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='friend_list')
+    friends = models.ManyToManyField(CustomUser, blank=True)
+
+
+class BaseList(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='%(class)s')
+    anime = models.ManyToManyField("anime.Anime", blank=True)
+
+    objects = ListManager()
+
+    class Meta:
+        abstract = True
+
+
+class WatchedList(BaseList):
+    class Meta:
+        verbose_name = 'Latched Lists'
+        verbose_name_plural = 'Watched Lists'
+
+
+class WatchList(BaseList):
+    class Meta:
+        verbose_name = "Watch List"
+        verbose_name_plural = "Watch Lists"
+
+
+class PlansList(BaseList):
+    class Meta:
+        verbose_name = "Plans List"
+        verbose_name_plural = "Plans Lists"
+
+
+class AbandonedList(BaseList):
+    class Meta:
+        verbose_name = "Abandoned List"
+        verbose_name_plural = "Abandoned Lists"
+
+
+class FavoriteList(BaseList):
+    class Meta:
+        verbose_name = "Favorite List"
+        verbose_name_plural = "Favorite Lists"

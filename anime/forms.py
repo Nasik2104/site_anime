@@ -36,3 +36,19 @@ class CreateRoomForm(forms.ModelForm):
         widgets = {
             'admin_id': forms.HiddenInput()
         }
+
+
+class ChooseListForm(forms.Form):
+    list = forms.ChoiceField(choices=[
+        ('null', 'Не в списку'),
+        ("favourite", "Улюблені"),
+        ("plans", "В Планах"),
+        ("watch", "Переглядаю"),
+        ("abandoned", "Покинуто"),
+        ("watched", "Преглянуто")
+    ],
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'list'
+        })
+    )

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os.path
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,10 +36,8 @@ SECRET_KEY = 'django-insecure-6)=a$hl3rla96s9(&3upc=2oguwxuv5ahwrvr@z(qkm17%a_a&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['joblink-7xsn.onrender.com']
+ALLOWED_HOSTS = ['192.168.0.114', 'localhost']
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -46,9 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'anime',
-    'users'
+    'users',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'anime_cite.wsgi.application'
 
+ASGI_APPLICATION = 'anime_cite.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -133,3 +141,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_REDIRECT_URL = "anime:index"
+LOGIN_URL = "user:login"
+LOGOUT_REDIRECT_URL = "anime:index"
+
+load_dotenv()
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.getenv(key='USER')
+EMAIL_HOST_PASSWORD = os.getenv('PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="container mt-5">
+        <div class="col-md-6 mx-auto">
+            <div class="row">
+                <form class="form-control" method="post" action="{% url 'user:user_edit' %}">
+                    <h3>Налаштування Користувача</h3>
+                    {% csrf_token %}
+                    {{ form_user.as_p }}
+                    <button type="submit" class="btn btn-success">Зберегти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% include 'users/profile_edit.html' %}
+{% endblock %}

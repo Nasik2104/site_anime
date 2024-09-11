@@ -5,10 +5,11 @@
     <div class="col-md-6 mx-auto">
         <h1>Вхід</h1>
         <form method="post">
-            {{ form.as_p }}
             {% csrf_token %}
+            {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Увійти</button>
         </form>
+        <a href="{% url 'user:password_reset' %}">Забули пароль?</a>
     </div>
 </div>
 {% endblock %}

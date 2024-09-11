@@ -1,0 +1,15 @@
+
+
+
+    <div class="container mt-5">
+        <div class="col-md-6 mx-auto">
+            <div class="row">
+                <form class="form-control" method="POST" action="{% url 'user:user_profile_edit' %}" enctype="multipart/form-data">
+                    <h3>Налаштування Профілю</h3>
+                    {% csrf_token %}
+                    {{ form_profile.as_p }}
+                    <button type="submit" class="btn btn-success">Зберегти</button>
+                </form>
+            </div>
+        </div>
+    </div>

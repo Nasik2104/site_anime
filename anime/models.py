@@ -28,10 +28,12 @@ class Anime(models.Model):
     year = models.IntegerField()
     studios = models.CharField(max_length=128)
     added_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     genres = models.ManyToManyField(Genre)
     voices = models.ManyToManyField(VoiceActingTeam)
     episodes_count = models.IntegerField(default=0)
     image = models.ImageField(upload_to='anime_images/')
+    views = models.IntegerField(default=0)
 
     objects = AnimeManager()
 
